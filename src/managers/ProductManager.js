@@ -1,3 +1,4 @@
+const path = require('node:path');
 const fs = require('fs').promises;
 class ProductManager {
 constructor(filePath) {
