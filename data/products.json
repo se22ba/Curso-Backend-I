@@ -1,57 +1,47 @@
 [
   {
     "id": 1,
-    "title": "Heladera Patrick HPK135M10",
+    "nombre": "Heladera Patrick HPK135M10",
     "description": "Heladera pequeña de bajo consumo, ideal para espacios reducidos.",
     "code": "HPK135M10",
     "price": 295000,
-    "status": true,
     "stock": 10,
-    "category": "heladeras",
-    "thumbnails": ["img/heladera_patrick.jpg"]
+    "category": "heladeras"
   },
   {
     "id": 2,
-    "title": "Aire Acondicionado Surrey 3000W Frío/Calor",
+    "nombre": "Aire Acondicionado Surrey 3000W Frío/Calor",
     "description": "Equipo inverter de alta eficiencia energética, bajo nivel sonoro.",
     "code": "SUR3000FC",
     "price": 720000,
-    "status": true,
     "stock": 8,
-    "category": "aires acondicionados",
-    "thumbnails": ["img/surrey_3000.jpg"]
+    "category": "aires acondicionados"
   },
   {
     "id": 3,
-    "title": "Freezer Gafa HGF280",
+    "nombre": "Freezer Gafa HGF280",
     "description": "Freezer horizontal 280L, tapa superior, clase A de eficiencia.",
     "code": "HGF280",
     "price": 615000,
-    "status": true,
     "stock": 5,
-    "category": "freezers",
-    "thumbnails": ["img/freezer_gafa.jpg"]
+    "category": "freezers"
   },
   {
     "id": 4,
-    "title": "Heladera No Frost Patrick HPK450NF",
+    "nombre": "Heladera No Frost Patrick HPK450NF",
     "description": "Heladera No Frost con control de temperatura digital y amplio espacio.",
     "code": "HPK450NF",
     "price": 899000,
-    "status": true,
     "stock": 6,
-    "category": "heladeras",
-    "thumbnails": ["img/heladera_nofrost.jpg"]
+    "category": "heladeras"
   },
   {
-    "id": 5,
-    "title": "Aire Acondicionado Philco 4500W Frío/Calor",
-    "description": "Aire acondicionado Philco 4500W frío/calor, tecnología inverter.",
-    "code": "PHI4500FC",
-    "price": 810000,
-    "status": true,
-    "stock": 9,
-    "category": "aires acondicionados",
-    "thumbnails": ["img/aire_philco_4500.jpg"]
+    "id": 6,
+    "nombre": "Heladera",
+    "description": "Heladera whirpool",
+    "code": "765gdhd",
+    "price": 200000,
+    "stock": 5,
+    "category": "Heladeras"
   }
 ]

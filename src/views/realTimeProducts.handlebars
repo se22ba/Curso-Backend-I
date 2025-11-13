@@ -1,0 +1,83 @@
+<h1>Productos</h1>
+
+<section>
+  <h2>Listado</h2>
+  <ul id="productList">
+    {{#each products}}
+      <li data-id="{{this.id}}">
+        <strong>{{this.nombre}}</strong> - ${{this.price}} (ID: {{this.id}})
+      </li>
+    {{/each}}
+  </ul>
+</section>
+
+<hr />
+
+<section>
+  <h2>Agregar producto </h2>
+  <form id="addProductForm">
+    <input name="nombre" placeholder="Nombre" required />
+    <input name="description" placeholder="Descripción" />
+    <input name="code" placeholder="Código" />
+    <input name="price" type="number" placeholder="Precio" />
+    <input name="stock" type="number" placeholder="Stock" />
+    <input name="category" placeholder="Categoría" />
+    <button type="submit">Crear</button>
+  </form>
+</section>
+
+<hr />
+
+<section>
+  <h2>Eliminar producto </h2>
+  <form id="deleteProductForm">
+    <input name="id" placeholder="ID de producto" required />
+    <button type="submit">Eliminar</button>
+  </form>
+</section>
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+  const socket = io();
+
+  const productList = document.getElementById('productList');
+  const addForm = document.getElementById('addProductForm');
+  const deleteForm = document.getElementById('deleteProductForm');
+
+  const renderProducts = (products) => {
+    productList.innerHTML = '';
+    products.forEach((p) => {
+      const li = document.createElement('li');
+      li.dataset.id = p.id;
+      li.innerHTML = `<strong>${p.nombre}</strong> - $${p.price} (ID: ${p.id})`;
+      productList.appendChild(li);
+    });
+  };
+
+  socket.on('products', (products) => {
+    renderProducts(products);
+  });
+
+  addForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+
+    const data = {
+      nombre: addForm.nombre.value,
+      description: addForm.description.value,
+      code: addForm.code.value,
+      price: addForm.price.value ? Number(addForm.price.value) : null,
+      stock: addForm.stock.value ? Number(addForm.stock.value) : null,
+      category: addForm.category.value
+    };
+
+    socket.emit('newProduct', data);
+    addForm.reset();
+  });
+
+  deleteForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const id = deleteForm.id.value;
+    socket.emit('deleteProduct', id);
+    deleteForm.reset();
+  });
+</script>
