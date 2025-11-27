@@ -1,0 +1,26 @@
+{{#if cart}}
+  <section class="cart-page">
+    <h1 class="page-title">Carrito {{cart._id}}</h1>
+
+    {{#if cart.products.length}}
+      <ul class="cart-list">
+        {{#each cart.products}}
+          <li class="cart-item">
+            <div class="cart-item-main">
+              <h2 class="product-title">{{this.product.nombre}}</h2>
+              <p class="product-description">{{this.product.description}}</p>
+            </div>
+            <div class="cart-item-meta">
+              <p>Cantidad: {{this.quantity}}</p>
+              <p>Precio: $ {{this.product.price}}</p>
+            </div>
+          </li>
+        {{/each}}
+      </ul>
+    {{else}}
+      <p>El carrito está vacío.</p>
+    {{/if}}
+  </section>
+{{else}}
+  <h1>Carrito no encontrado</h1>
+{{/if}}

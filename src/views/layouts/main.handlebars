@@ -1,10 +1,29 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <title>Productos</title>
+  <meta charset="UTF-8">
+  <title>{{title}}</title>
+  <link rel="stylesheet" href="/css/styles.css">
 </head>
 <body>
-  {{{body}}}
+  <header class="site-header">
+    <div class="container header-content">
+      <h1 class="logo">Curso Backend I</h1>
+      <nav class="main-nav">
+        <a href="/">Home</a>
+        <a href="/products">Productos</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    {{{body}}}
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p>Coderhouse · Backend I · Pafundi</p>
+    </div>
+  </footer>
 </body>
 </html>
