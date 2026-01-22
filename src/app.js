@@ -11,6 +11,10 @@ const cartsRouter = require('./routes/carts.router');
 const viewsRouter = require('./routes/views.router');
 const Product = require('./dao/models/product.model');
 
+const passport = require('passport');
+const initializePassport = require('./config/passport');
+const sessionsRouter = require('./routes/sessions.router');
+
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
@@ -18,11 +22,15 @@ const io = new Server(server);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
+initializePassport();
+app.use(passport.initialize());
+
 
 app.engine('handlebars', exphbs.engine());
 app.set('view engine', 'handlebars');
 app.set('views', path.join(__dirname, 'views'));
 
+app.use('/api/sessions', sessionsRouter);
 app.use('/', viewsRouter);
 app.use('/api/products', productsRouter);
 app.use('/api/carts', cartsRouter);

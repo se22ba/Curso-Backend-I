@@ -5,13 +5,27 @@ const Cart = require('../dao/models/cart.model');
 const router = Router();
 
 router.get('/', async (req, res) => {
-  const products = await Product.find().lean();
-  res.render('home', { products });
+  try {
+    const products = await Product.find().lean();
+    res.render('home', {
+      title: 'Home',
+      products
+    });
+  } catch (err) {
+    res.status(500).send('Error al cargar Home');
+  }
 });
 
 router.get('/realtimeproducts', async (req, res) => {
-  const products = await Product.find().lean();
-  res.render('realTimeProducts', { products });
+  try {
+    const products = await Product.find().lean();
+    res.render('realTimeProducts', {
+      title: 'Tiempo Real',
+      products
+    });
+  } catch (err) {
+    res.status(500).send('Error al cargar RealTimeProducts');
+  }
 });
 
 router.get('/products', async (req, res) => {
@@ -24,22 +38,14 @@ router.get('/products', async (req, res) => {
 
     const filter = {};
     if (query) {
-      if (query === 'disponible') {
-        filter.stock = { $gt: 0 };
-      } else if (query === 'no-disponible') {
-        filter.stock = { $lte: 0 };
-      } else {
-        filter.category = query;
-      }
+      if (query === 'disponible') filter.stock = { $gt: 0 };
+      else if (query === 'no-disponible') filter.stock = { $lte: 0 };
+      else filter.category = query;
     }
 
     const sortOptions = {};
-    if (sort === 'asc') {
-      sortOptions.price = 1;
-    }
-    if (sort === 'desc') {
-      sortOptions.price = -1;
-    }
+    if (sort === 'asc') sortOptions.price = 1;
+    if (sort === 'desc') sortOptions.price = -1;
 
     const skip = (page - 1) * limit;
 
@@ -58,25 +64,15 @@ router.get('/products', async (req, res) => {
     const buildLink = targetPage => {
       const params = new URLSearchParams();
       params.set('page', targetPage);
-      if (req.query.limit) {
-        params.set('limit', req.query.limit);
-      }
-      if (req.query.sort) {
-        params.set('sort', req.query.sort);
-      }
-      if (req.query.query) {
-        params.set('query', req.query.query);
-      }
-      if (cartId) {
-        params.set('cid', cartId);
-      }
+      if (req.query.limit) params.set('limit', req.query.limit);
+      if (req.query.sort) params.set('sort', req.query.sort);
+      if (req.query.query) params.set('query', req.query.query);
+      if (cartId) params.set('cid', cartId);
       return `${basePath}?${params.toString()}`;
     };
 
-    const prevLink = hasPrevPage ? buildLink(prevPage) : null;
-    const nextLink = hasNextPage ? buildLink(nextPage) : null;
-
     res.render('products', {
+      title: 'Productos',
       products,
       totalPages,
       prevPage,
@@ -84,8 +80,8 @@ router.get('/products', async (req, res) => {
       page,
       hasPrevPage,
       hasNextPage,
-      prevLink,
-      nextLink,
+      prevLink: hasPrevPage ? buildLink(prevPage) : null,
+      nextLink: hasNextPage ? buildLink(nextPage) : null,
       cartId
     });
   } catch (err) {
@@ -95,8 +91,14 @@ router.get('/products', async (req, res) => {
 
 router.get('/carts/:cid', async (req, res) => {
   try {
-    const cart = await Cart.findById(req.params.cid).populate('products.product').lean();
-    res.render('cart', { cart });
+    const cart = await Cart.findById(req.params.cid)
+      .populate('products.product')
+      .lean();
+
+    res.render('cart', {
+      title: 'Carrito',
+      cart
+    });
   } catch (err) {
     res.status(500).send('Error al cargar carrito');
   }
