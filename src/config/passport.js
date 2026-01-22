@@ -60,7 +60,7 @@ const initializePassport = () => {
       },
       async (payload, done) => {
         try {
-          const user = await User.findById(payload.id).lean();
+          const user = await User.findById(payload.id).select('-password').lean();
           if (!user) return done(null, false);
           return done(null, user);
         } catch (err) {
