@@ -4,16 +4,18 @@ const http = require('http');
 const { Server } = require('socket.io');
 const exphbs = require('express-handlebars');
 const mongoose = require('mongoose');
+const cookieParser = require('cookie-parser');
+const passport = require('passport');
 require('dotenv').config();
 
 const productsRouter = require('./routes/products.router');
 const cartsRouter = require('./routes/carts.router');
-const viewsRouter = require('./routes/views.router');
-const Product = require('./dao/models/product.model');
-
-const passport = require('passport');
-const initializePassport = require('./config/passport');
 const sessionsRouter = require('./routes/sessions.router');
+const viewsRouter = require('./routes/views.router');
+
+const ProductsRepository = require('./repositories/products.repository');
+
+const initializePassport = require('./config/passport');
 
 const app = express();
 const server = http.createServer(app);
@@ -21,17 +23,18 @@ const io = new Server(server);
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
-initializePassport();
-app.use(passport.initialize());
-
 
 app.engine('handlebars', exphbs.engine());
 app.set('view engine', 'handlebars');
 app.set('views', path.join(__dirname, 'views'));
 
-app.use('/api/sessions', sessionsRouter);
+initializePassport();
+app.use(passport.initialize());
+
 app.use('/', viewsRouter);
+app.use('/api/sessions', sessionsRouter);
 app.use('/api/products', productsRouter);
 app.use('/api/carts', cartsRouter);
 
@@ -39,27 +42,26 @@ app.use((req, res) => {
   res.status(404).json({ error: 'Ruta no encontrada' });
 });
 
+const productsRepo = new ProductsRepository();
+
 io.on('connection', async socket => {
-  const docs = await Product.find().lean();
-  const products = docs.map(p => ({ ...p, id: p._id.toString() }));
+  const products = await productsRepo.getAllLean();
   socket.emit('products', products);
 
   socket.on('newProduct', async data => {
-    await Product.create(data);
-    const updatedDocs = await Product.find().lean();
-    const updated = updatedDocs.map(p => ({ ...p, id: p._id.toString() }));
+    await productsRepo.create(data);
+    const updated = await productsRepo.getAllLean();
     io.emit('products', updated);
   });
 
   socket.on('deleteProduct', async id => {
-    await Product.findByIdAndDelete(id);
-    const updatedDocs = await Product.find().lean();
-    const updated = updatedDocs.map(p => ({ ...p, id: p._id.toString() }));
+    await productsRepo.deleteById(id);
+    const updated = await productsRepo.getAllLean();
     io.emit('products', updated);
   });
 });
 
-const PORT = 8080;
+const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 8080;
 const MONGO_URL = process.env.MONGO_URL;
 
 mongoose

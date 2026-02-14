@@ -1,25 +1,32 @@
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 const JWTStrategy = require('passport-jwt').Strategy;
-const ExtractJwt = require('passport-jwt').ExtractJwt;
 
-const User = require('../dao/models/user.model');
-const Cart = require('../dao/models/cart.model');
+const UsersRepository = require('../repositories/users.repository');
+const CartsRepository = require('../repositories/carts.repository');
 const { createHash, isValidPassword } = require('../utils/hash');
 
+const cookieExtractor = req => {
+  if (!req || !req.cookies) return null;
+  return req.cookies.token || null;
+};
+
 const initializePassport = () => {
+  const usersRepo = new UsersRepository();
+  const cartsRepo = new CartsRepository();
+
   passport.use(
     'register',
     new LocalStrategy(
       { usernameField: 'email', passReqToCallback: true },
       async (req, email, password, done) => {
         try {
-          const exists = await User.findOne({ email });
+          const exists = await usersRepo.findByEmail(email);
           if (exists) return done(null, false);
 
-          const cart = await Cart.create({ products: [] });
+          const cart = await cartsRepo.createEmpty();
 
-          const user = await User.create({
+          const user = await usersRepo.create({
             first_name: req.body.first_name,
             last_name: req.body.last_name,
             email,
@@ -41,7 +48,7 @@ const initializePassport = () => {
     'login',
     new LocalStrategy({ usernameField: 'email' }, async (email, password, done) => {
       try {
-        const user = await User.findOne({ email });
+        const user = await usersRepo.findByEmailWithPassword(email);
         if (!user) return done(null, false);
         if (!isValidPassword(user, password)) return done(null, false);
         return done(null, user);
@@ -55,12 +62,12 @@ const initializePassport = () => {
     'current',
     new JWTStrategy(
       {
-        jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+        jwtFromRequest: cookieExtractor,
         secretOrKey: process.env.JWT_SECRET
       },
       async (payload, done) => {
         try {
-          const user = await User.findById(payload.id).select('-password').lean();
+          const user = await usersRepo.findByIdSafe(payload.id);
           if (!user) return done(null, false);
           return done(null, user);
         } catch (err) {

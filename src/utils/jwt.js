@@ -14,4 +14,11 @@ const generateToken = user => {
   return jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' });
 };
 
-module.exports = { generateToken };
+const generateResetToken = ({ id, email }) => {
+  const payload = { id, email, purpose: 'password_reset' };
+  return jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' });
+};
+
+const verifyToken = token => jwt.verify(token, process.env.JWT_SECRET);
+
+module.exports = { generateToken, generateResetToken, verifyToken };
